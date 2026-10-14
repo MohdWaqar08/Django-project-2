@@ -12,7 +12,7 @@
     {% if user.is_authenticated %}
         <h2>Hello, {{ user.username }}!</h2>
         <p>You are logged in successfully.</p>
-
+        <a href="{% url 'add_blog' %}">+ Add Blog</a>
          <form method="POST" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit">Logout</button>
@@ -23,5 +23,29 @@
         <br>
         <a href="{% url 'register' %}">Register</a>
     {% endif %}
+
+
+    {% for post in posts %}
+        <article>
+            <h2>{{ post.title }}</h2>
+
+            <p>By {{ post.author }}</p>
+            <p>{{ post.created_at }}</p>
+
+            <p>{{ post.content|linebreaks }}</p>
+
+            {% if post.image %}
+                <img
+                    src="{{ post.image.url }}"
+                    alt="{{ post.title }}"
+                    style="max-width: 100%; height: auto;"
+                >
+            {% endif %}
+        </article>
+
+        <hr>
+    {% empty %}
+        <p>No blogs have been published yet.</p>
+    {% endfor %}
 </body>
 </html>
