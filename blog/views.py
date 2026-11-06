@@ -23,11 +23,10 @@ def add_blog(request):
 
 
 def home(request):
-    posts = Post.objects.select_related('author').order_by('-created_at')
+    posts = Post.objects.select_related('author').order_by('-created_on')
 
-    return render(request, 'blog/home.html', {
-        'posts': posts
-    })
+    return render(request, 'blog/home.html', {'posts':posts})
+
 
 
 @login_required

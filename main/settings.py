@@ -130,3 +130,4 @@ MAILERS = {
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+LOGIN_REDIRECT_URL = 'blog_home'  # or whatever your home page name is
