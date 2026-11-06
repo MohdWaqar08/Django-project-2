@@ -1,0 +1,9 @@
+<h1>{{ object.title }}</h1>
+<p>Written by: {{ object.author }}</p>
+<hr>
+<div>
+    {{ object.content }}
+    {% if object.image %}
+    <img src="{{ object.image.url }}" alt="{{ object.title }}" width="400">
+    {% endif %}
+</div>

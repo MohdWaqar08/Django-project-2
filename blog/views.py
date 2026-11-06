@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import PostForm
 from .models import Post
-from django.views.generic import ListView, UpdateView, DeleteView, CreateView
+from django.views.generic import ListView, UpdateView, DeleteView, CreateView, DetailView
 from django.urls import reverse_lazy
 
 
@@ -23,6 +23,10 @@ class DisplayPost(ListView):
     model = Post
     template_name = 'blog/home.html'
     context_object_name = 'posts'
+
+class DetailPost(DetailView):
+    model = Post
+    template_name = 'blog/detailed_post.html'
 
 
 
