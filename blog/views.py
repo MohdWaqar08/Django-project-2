@@ -2,61 +2,39 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import PostForm
 from .models import Post
+from django.views.generic import ListView, UpdateView, DeleteView, CreateView
+from django.urls import reverse_lazy
 
 
-@login_required
-def add_blog(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)
+class AddPost(CreateView):
+    model = Post
+    fields = ['title', 'content', 'image']
+    template_name = 'blog/add_blog.html'
 
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('blog_home')
-    else:
-        form = PostForm()
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
-    return render(request, 'blog/add_blog.html', {
-        'form': form
-    })
+    success_url = reverse_lazy('blog_home')
+    
 
 
-def home(request):
-    posts = Post.objects.select_related('author').order_by('-created_on')
-
-    return render(request, 'blog/home.html', {'posts':posts})
+class DisplayPost(ListView):
+    model = Post
+    template_name = 'blog/home.html'
+    context_object_name = 'posts'
 
 
 
-@login_required
-def edit_blog(request, post_id):
-    post = get_object_or_404(Post, id=post_id, author=request.user)
 
-    if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES, instance=post)
+class UpdatePost(UpdateView):
+    model = Post
+    fields = ['title', 'content', 'image']
+    template_name = 'blog/edit_blog.html'
+    success_url = reverse_lazy('blog_home')
 
-        if form.is_valid():
-            form.save()
-            return redirect('blog_home')
-    else:
-        form = PostForm(instance=post)
 
-    return render(request, 'blog/edit_blog.html', {
-        'form': form,
-        'post': post
-    })
-
-@login_required
-def delete_blog(request, post_id):
-    post = get_object_or_404(
-        Post, id=post_id, author=request.user
-    )
-
-    if request.method == 'POST':
-        post.delete()
-        return redirect('blog_home')
-
-    return render(request, 'blog/delete_blog.html', {
-        'post': post
-    })
+class DeletePost(DeleteView):
+    model = Post
+    template_name = 'blog/delete_blog.html'
+    success_url = reverse_lazy('blog_home')
