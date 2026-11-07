@@ -16,21 +16,7 @@
     <form method="POST">
         {% csrf_token %}
 
-        <label>Username:</label>
-        <input type="text" name="username" required>
-        <br><br>
-
-        <label>Email:</label>
-        <input type="email" name="email" required>
-        <br><br>
-
-        <label>Password:</label>
-        <input type="password" name="passwd" required>
-        <br><br>
-
-        <label>Confirm Password:</label>
-        <input type="password" name="confirm_passwd" required>
-        <br><br>
+        {{ form.as_p}}
 
         <button type="submit">Register</button>
     </form>
