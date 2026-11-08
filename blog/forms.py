@@ -1,6 +1,6 @@
 
 from django import forms
-from .models import Post
+from .models import Post,Subreddits
 
 
 class PostForm(forms.ModelForm):
@@ -12,3 +12,14 @@ class PostForm(forms.ModelForm):
             'content':forms.Textarea(attrs={'placeholder' : 'Text(Optional)'}),
             'url':forms.URLInput(attrs={'placeholder': 'URL(optional)'})
         }
+
+class SubredditForm(forms.ModelForm):
+    class Meta:
+        model = Subreddits
+        fields = ['name', 'slug', 'description']
+        widgets = {
+                    'name':forms.TextInput(attrs={'placeholder':'Name of Subreddit'}),
+                    'slug':forms.Textarea(attrs={'placeholder' : 'Slug'}),
+                    'description':forms.Textarea(attrs={'placeholder': 'Description(optional)'})
+                }
+

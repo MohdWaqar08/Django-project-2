@@ -12,7 +12,10 @@
     {% if user.is_authenticated %}
         <h2>Hello, {{ user.username }}!</h2>
         <p>You are logged in successfully.</p>
+        <div>
         <a href="{% url 'add_blog' %}">+ Add Blog</a>
+        <a href="{% url 'create_subreddit' %}">+ Add Subreddit </a>
+        </div>
          <form method="POST" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit">Logout</button>
@@ -36,12 +39,15 @@
             </div>
 
             <!-- Post Title & Content -->
-            <h2><a href="#">{{ post.title }}</a></h2>
+            <h2><a href="{% url 'comment' post.id %}">{{ post.title }}</a></h2>
             <p>{{ post.content|truncatewords:30 }}</p>
 
             {% if post.image %}
                 <img src="{{ post.image.url }}" alt="{{ post.title }}">
             {% endif %}
+            <a>💬 Comments</a>
+            <a href="{% url 'update_blog' post.id %}">Update</a>
+            <a href="{% url 'delete_blog' post.id %}">Delete</a>
         </div>
     {% empty %}
         <p>No posts yet. Be the first to share something!</p>

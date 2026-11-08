@@ -6,4 +6,13 @@
     {% if object.image %}
     <img src="{{ object.image.url }}" alt="{{ object.title }}" width="400">
     {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    </form>
+
+    <a href = "{% url 'blog_home' %}">Home Page</a>
 </div>
