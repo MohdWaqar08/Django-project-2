@@ -1,6 +1,6 @@
 
 from django import forms
-from .models import Post,Subreddits
+from .models import Post,Subreddits, Comments
 
 
 class PostForm(forms.ModelForm):
@@ -23,3 +23,10 @@ class SubredditForm(forms.ModelForm):
                     'description':forms.Textarea(attrs={'placeholder': 'Description(optional)'})
                 }
 
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comments
+        fields = ['content']
+        widgets = {
+            'content' : forms.Textarea(attrs={'placeholder': 'Write a comment'})
+        }

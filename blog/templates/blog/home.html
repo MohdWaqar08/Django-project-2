@@ -45,7 +45,7 @@
             {% if post.image %}
                 <img src="{{ post.image.url }}" alt="{{ post.title }}">
             {% endif %}
-            <a>💬 Comments</a>
+            <a href="{% url 'create_subreddit' %}">💬 Comments</a>
             <a href="{% url 'update_blog' post.id %}">Update</a>
             <a href="{% url 'delete_blog' post.id %}">Delete</a>
         </div>

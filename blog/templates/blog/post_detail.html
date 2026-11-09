@@ -1,0 +1,42 @@
+<h1>{{ post.title }}</h1>
+<p>Written by: {{ post.author }}</p>
+<hr>
+<div>
+    {{ post.content }}
+    {% if post.image %}
+    <img src="{{ post.image.url }}" alt="{{ post.title }}" width="400">
+    {% endif %}
+    <hr>
+
+    <!-- Display Comments Section -->
+<div class="comments-section">
+    <h3>Comments ({{ comments.count }})</h3>
+
+    <div class="comment-list">
+        {% for comment in comments %}
+            <div class="comment-item" style="margin-bottom: 15px; border-left: 2px solid #ccc; padding-left: 10px;">
+                <p><strong>{{ comment.author }}</strong> <small>{{ comment.created_at|timesince }} ago</small></p>
+                <p>{{ comment.content }}</p>
+            </div>
+        {% empty %}
+            <p>No comments yet. Be the first to share what you think!</p>
+        {% endfor %}
+    </div>
+</div>
+
+    <hr>
+    <!-- Comment Submission Form -->
+    {% if user.is_authenticated %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Comment</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in</a> to leave a comment.</p>
+    {% endif %}
+
+    <hr>
+
+    <a href = "{% url 'blog_home' %}">Home Page</a>
+</div>
