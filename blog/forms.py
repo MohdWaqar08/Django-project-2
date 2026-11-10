@@ -28,5 +28,5 @@ class CommentForm(forms.ModelForm):
         model = Comments
         fields = ['content']
         widgets = {
-            'content' : forms.Textarea(attrs={'placeholder': 'Write a comment'})
+            'content' : forms.Textarea(attrs={'placeholder': 'To reply to a comment, \nadd the name of author'})
         }

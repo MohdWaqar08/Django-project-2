@@ -13,6 +13,14 @@
         <h2>Hello, {{ user.username }}!</h2>
         <p>You are logged in successfully.</p>
         <div>
+            <div>
+            <!-- templates/navbar.html -->
+            <form action="{% url 'search_result' %}" method="GET">
+                <input type="text" name="q" placeholder="Search entries..." required>
+                <button type="submit">Search</button>
+            </form>
+            </div>
+
         <a href="{% url 'add_blog' %}">+ Add Blog</a>
         <a href="{% url 'create_subreddit' %}">+ Add Subreddit </a>
         </div>
@@ -33,7 +41,7 @@
         <div class="post-card">
             <!-- Subreddit and Author info line -->
             <div class="post-meta">
-                <a href="#">r/{{ post.subreddits.name }}</a> • 
+                <a href="{% url 'subreddit_feed' post.subreddits.slug %}">r/{{ post.subreddits.name }}</a> • 
                 Posted by u/{{ post.author.username }} 
                 <span class="timestamp">{{ post.created_on|timesince }} ago</span>
             </div>
@@ -45,7 +53,7 @@
             {% if post.image %}
                 <img src="{{ post.image.url }}" alt="{{ post.title }}">
             {% endif %}
-            <a href="{% url 'create_subreddit' %}">💬 Comments</a>
+            <a href="{% url 'comment' post.id %}">💬 Comments</a>
             <a href="{% url 'update_blog' post.id %}">Update</a>
             <a href="{% url 'delete_blog' post.id %}">Delete</a>
         </div>

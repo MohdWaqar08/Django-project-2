@@ -5,6 +5,7 @@ from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from . forms import PostForm, SubredditForm, CommentForm
+from django.db.models import Q
 
 # View to create posts
 class AddPost(LoginRequiredMixin, CreateView):
@@ -27,9 +28,22 @@ class CreateSubreddit(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.creator = self.request.user
         return super().form_valid(form)
-    
-    
 
+# Display a specfic subreddit
+class SubredditFeed(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'blog/subreddit_detail.html'
+    context_object_name = 'posts'
+    paginate_by = 25
+
+    def get_queryset(self):
+        self.subreddit = get_object_or_404(Subreddits, slug = self.kwargs['slug'])
+        return Post.objects.filter(subreddits = self.subreddit).select_related('subreddits', 'author').order_by('-created_on')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['subreddit'] = self.subreddit
+        return context 
 
 class HomePageFeed(ListView):
     model = Post
@@ -39,6 +53,21 @@ class HomePageFeed(ListView):
 
     def get_queryset(self):
         return Post.objects.select_related('subreddits', 'author').order_by('-created_on')
+
+
+# Search Functionality
+class SearchFeed(ListView):
+    model = Post
+    template_name = 'blog/search_result.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q') #name of the variable in the form(html page nav bar)
+        return Post.objects.filter(
+            Q(title__icontains = query) | Q(subreddits__name__icontains = query)
+            | Q(content__icontains = query)
+        )
+
 
 # Handles comments
 class CommentView(FormMixin,DetailView):

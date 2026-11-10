@@ -1,0 +1,27 @@
+<div class="feed-container">
+    {% for post in posts %}
+        <div class="post-card">
+            <!-- Subreddit and Author info line -->
+            <div class="post-meta">
+                <a href="{% url 'subreddit_feed' post.subreddits.slug %}">r/{{ post.subreddits.name }}</a> • 
+                Posted by u/{{ post.author.username }} 
+                <span class="timestamp">{{ post.created_on|timesince }} ago</span>
+            </div>
+
+            <!-- Post Title & Content -->
+            <h2><a href="{% url 'comment' post.id %}">{{ post.title }}</a></h2>
+            <p>{{ post.content|truncatewords:30 }}</p>
+
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="{{ post.title }}">
+            {% endif %}
+            <a href="{% url 'comment' post.id %}">💬 Comments</a>
+            <a href="{% url 'update_blog' post.id %}">Update</a>
+            <a href="{% url 'delete_blog' post.id %}">Delete</a>
+        </div>
+    {% empty %}
+        <p>No posts yet. Be the first to share something!</p>
+    {% endfor %}
+</div>
+
+<a href="{% url 'blog_home' %}"> Go home</a>

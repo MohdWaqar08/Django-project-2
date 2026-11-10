@@ -1,0 +1,24 @@
+<!-- templates/subreddit_detail.html -->
+<div class="subreddit-header">
+    <h1>r/{{ subreddit.name }}</h1>
+    <p>{{ subreddit.description }}</p>
+    <small>Created by u/{{ subreddit.creator.username }} on {{ subreddit.created_at|date:"F j, Y" }}</small>
+</div>
+
+<hr>
+
+<div class="feed-container">
+    <h2>Posts in r/{{ subreddit.name }}</h2>
+    {% for post in posts %}
+        <div class="post-card">
+            <div class="post-meta">
+                Posted by u/{{ post.author.username }} • 
+                <span class="timestamp">{{ post.created_on|timesince }} ago</span>
+            </div>
+            <h3><a href="#">{{ post.title }}</a></h3>
+            <p>{{ post.content|truncatewords:30 }}</p>
+        </div>
+    {% empty %}
+        <p>There are no posts in r/{{ subreddit.name }} yet. Be the first to create one!</p>
+    {% endfor %}
+</div>
