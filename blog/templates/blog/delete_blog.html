@@ -1,10 +1,31 @@
-<h1>Delete Blog Post</h1>
+{% extends 'base.html' %}
 
-<p>Are you sure you want to delete "{{ post.title }}"?</p>
+{% block title %}Delete Post | Discuss{% endblock %}
 
-<form method="POST">
-    {% csrf_token %}
-    <button type="submit">Yes, Delete</button>
-</form>
+{% block content %}
+<div class="max-w-md mx-auto mt-8">
+    <div class="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-xs text-center">
+        
+        <!-- Warning Badge -->
+        <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+            !
+        </div>
 
-<a href="{% url 'blog_home' %}">Cancel</a>
+        <h1 class="text-lg font-bold text-slate-900 mb-2">Delete Post?</h1>
+        <p class="text-sm text-slate-600 leading-relaxed mb-6">
+            Are you sure you want to delete <span class="font-semibold text-slate-900">"{{ post.title }}"</span>? This action cannot be undone.
+        </p>
+
+        <form method="POST" class="flex items-center justify-center gap-3">
+            {% csrf_token %}
+            <a href="{% url 'blog_home' %}" class="flex-1 px-4 py-2.5 rounded-full border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+                Cancel
+            </a>
+            <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2.5 rounded-full transition cursor-pointer">
+                Yes, Delete
+            </button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

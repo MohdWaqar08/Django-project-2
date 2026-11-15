@@ -1,24 +1,48 @@
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-</head>
-<body>
-    <h2>Create an Account</h2>
+{% block title %}Sign Up | Discuss{% endblock %}
 
-    {% for message in messages %}
-        <p>{{ message }}</p>
-    {% endfor %}
+{% block content %}
+<div class="max-w-md mx-auto mt-6">
+    <div class="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-xs">
+        
+        <div class="text-center mb-6">
+            <h1 class="text-xl font-bold text-slate-900">Create an Account</h1>
+            <p class="text-xs text-slate-500 mt-1">Join communities and start sharing your ideas.</p>
+        </div>
 
-    <form method="POST">
-        {% csrf_token %}
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
 
-        {{ form.as_p}}
+            {% if form.non_field_errors %}
+                <div class="p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
 
-        <button type="submit">Register</button>
-    </form>
-</body>
-</html>
+            <!-- Automatically styles all UserCreationForm fields, help texts, and validation errors -->
+            <div class="space-y-4
+                [&_p]:space-y-1.5
+                [&_label]:block [&_label]:text-sm [&_label]:font-semibold [&_label]:text-slate-700
+                [&_input]:w-full [&_input]:rounded-lg [&_input]:border [&_input]:border-slate-300 [&_input]:px-3.5 [&_input]:py-2 [&_input]:text-sm [&_input]:text-slate-800 [&_input:focus]:border-indigo-500 [&_input:focus]:outline-none [&_input:focus]:ring-2 [&_input:focus]:ring-indigo-500/20
+                [&_.helptext]:block [&_.helptext]:text-xs [&_.helptext]:text-slate-400 [&_.helptext]:leading-relaxed
+                [&_ul]:text-xs [&_ul]:text-slate-400 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-0.5
+                [&_.errorlist]:text-xs [&_.errorlist]:text-red-600 [&_.errorlist]:font-medium [&_.errorlist]:list-none [&_.errorlist]:pl-0">
+                {{ form.as_p }}
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2.5 rounded-full transition cursor-pointer mt-2">
+                Create Account
+            </button>
+        </form>
+
+        <p class="text-center text-xs text-slate-500 mt-6 pt-4 border-t border-slate-100">
+            Already have an account? 
+            <a href="{% url 'login' %}" class="font-semibold text-indigo-600 hover:text-indigo-700 hover:underline">
+                Log in here
+            </a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}

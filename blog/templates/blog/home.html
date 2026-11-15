@@ -1,101 +1,153 @@
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
-</head>
-<body>
-    <h1>Welcome to My Website!</h1>
+{% block title %}Home | Discuss{% endblock %}
 
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-    {% if user.is_authenticated %}
-        <h2>Hello, {{ user.username }}!</h2>
-        <p>You are logged in successfully.</p>
-        <div>
-            <div>
-            <!-- templates/navbar.html -->
-            <form action="{% url 'search_result' %}" method="GET">
-                <input type="text" name="q" placeholder="Search entries..." required>
-                <button type="submit">Search</button>
-            </form>
-            </div>
-
-        <a href="{% url 'add_blog' %}">+ Add Blog</a>
-        <a href="{% url 'create_subreddit' %}">+ Add Subreddit </a>
-        </div>
-         <form method="POST" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit">Logout</button>
-        </form>
-    {% else %}
-        <p>You are not logged in.</p>
-        <a href="{% url 'login' %}">Login</a>
-        <br>
-        <a href="{% url 'register' %}">Register</a>
-    {% endif %}
-
-    {% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
-
-{% block content %}{% endblock %}
-
-    <div class="feed-container">
-    {% for post in posts %}
-        <div class="post-card">
-            <!-- Subreddit and Author info line -->
-            <div class="post-meta">
-                <a href="{% url 'subreddit_feed' post.subreddits.slug %}">r/{{ post.subreddits.name }}</a>
-                Posted by u/{{ post.author.username }} 
-                <span class="timestamp">{{ post.created_on|timesince }} ago</span>
-            </div>
-
-            <!-- Post Title & Content -->
-            <h2><a href="{% url 'comment' post.id %}">{{ post.title }}</a></h2>
-            <p>{{ post.content|truncatewords:30 }}</p>
-
-            {% if post.image %}
-                <img src="{{ post.image.url }}" alt="{{ post.title }}">
-            {% endif %}
-
-            <!-- Action Bar (Voting + Links) -->
-            <div class="post-actions" style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+    <!-- Left Column: Main Post Feed (Takes 2 of 3 columns on desktop) -->
+    <div class="lg:col-span-2 space-y-4">
+        
+        {% for post in posts %}
+            <article class="bg-white border border-slate-200 hover:border-slate-300 rounded-xl shadow-xs transition flex overflow-hidden">
                 
-                <!-- Voting Widget -->
-                <div class="voting-widget" style="display: flex; align-items: center; gap: 6px;">
-                    <form action="{% url 'post-vote' post.id %}" method="post" style="margin: 0;">
+                <!-- Left Vertical Vote Strip -->
+                <div class="bg-slate-50/80 px-3 py-4 flex flex-col items-center justify-start gap-1 border-r border-slate-100 select-none">
+                    <form action="{% url 'post-vote' post.id %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="value" value="1">
-                        <button type="submit" style="cursor: pointer;">⬆</button>
+                        <button type="submit" title="Upvote" class="p-1 rounded hover:bg-orange-100 text-slate-500 hover:text-orange-600 transition cursor-pointer">
+                            ▲
+                        </button>
                     </form>
 
-                    <span style="font-weight: bold;">{{ post.total_score }}</span>
+                    <span class="text-xs font-bold text-slate-800">{{ post.total_score }}</span>
 
-                    <form action="{% url 'post-vote' post.id %}" method="post" style="margin: 0;">
+                    <form action="{% url 'post-vote' post.id %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="value" value="-1">
-                        <button type="submit" style="cursor: pointer;">⬇</button>
+                        <button type="submit" title="Downvote" class="p-1 rounded hover:bg-indigo-100 text-slate-500 hover:text-indigo-600 transition cursor-pointer">
+                            ▼
+                        </button>
                     </form>
                 </div>
 
-                <!-- Existing Links -->
-                <a href="{% url 'comment' post.id %}">💬 Comments</a>
-                {% if request.user == post.author %}
-                <a href="{% url 'update_blog' post.id %}">Update</a>
-                <a href="{% url 'delete_blog' post.id %}">Delete</a>
+                <!-- Right Post Content Body -->
+                <div class="p-4 flex-1 min-w-0">
+                    
+                    <!-- Metadata Line -->
+                    <div class="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 mb-1.5">
+                        <a href="{% url 'subreddit_feed' post.subreddits.slug %}" class="font-bold text-slate-800 hover:text-indigo-600 hover:underline">
+                            r/{{ post.subreddits.name }}
+                        </a>
+                        <span>•</span>
+                        <span>Posted by u/{{ post.author.username }}</span>
+                        <span>•</span>
+                        <span>{{ post.created_on|timesince }} ago</span>
+                    </div>
+
+                    <!-- Post Title -->
+                    <h2 class="text-lg font-semibold text-slate-900 leading-snug mb-2">
+                        <a href="{% url 'comment' post.id %}" class="hover:text-indigo-600 transition">
+                            {{ post.title }}
+                        </a>
+                    </h2>
+
+                    <!-- Post Snippet -->
+                    {% if post.content %}
+                        <p class="text-sm text-slate-600 leading-relaxed mb-3">
+                            {{ post.content|truncatewords:30 }}
+                        </p>
+                    {% endif %}
+
+                    <!-- Optional Post Image -->
+                    {% if post.image %}
+                        <div class="mb-3 rounded-lg overflow-hidden border border-slate-100 bg-slate-50">
+                            <a href="{% url 'comment' post.id %}">
+                                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="max-h-96 w-full object-contain mx-auto">
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    <!-- Bottom Action Bar -->
+                    <div class="flex items-center gap-4 pt-1 text-xs font-medium text-slate-500">
+                        <a href="{% url 'comment' post.id %}" class="flex items-center gap-1.5 px-2 py-1.5 rounded-md hover:bg-slate-100 hover:text-slate-800 transition">
+                            <span>💬</span>
+                            <span>Comments</span>
+                        </a>
+
+                        {% if request.user == post.author %}
+                            <a href="{% url 'update_blog' post.id %}" class="px-2 py-1.5 rounded-md hover:bg-slate-100 hover:text-indigo-600 transition">
+                                Edit
+                            </a>
+                            <a href="{% url 'delete_blog' post.id %}" class="px-2 py-1.5 rounded-md hover:bg-red-50 hover:text-red-600 transition">
+                                Delete
+                            </a>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </article>
+        {% empty %}
+            <div class="bg-white border border-slate-200 rounded-xl p-10 text-center">
+                <p class="text-slate-600 font-medium mb-2">No posts yet.</p>
+                <p class="text-sm text-slate-400 mb-4">Be the first to start a discussion!</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'add_blog' %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-full transition">
+                        Create First Post
+                    </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <!-- Pagination (if your ListView uses paginate_by) -->
+        {% if is_paginated %}
+            <div class="flex items-center justify-between pt-2">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg transition">
+                        ← Previous
+                    </a>
+                {% else %}
+                    <span></span>
+                {% endif %}
+
+                <span class="text-xs text-slate-500">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg transition">
+                        Next →
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Right Column: Sticky Sidebar (Takes 1 of 3 columns on desktop) -->
+    <aside class="space-y-4 lg:sticky lg:top-20">
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+            <h3 class="font-bold text-slate-900 text-base mb-1">Home Feed</h3>
+            <p class="text-sm text-slate-500 leading-relaxed mb-4">
+                Your personal frontpage. Come here to check in with your favorite communities and join discussions.
+            </p>
+            <div class="space-y-2.5">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'add_blog' %}" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 rounded-full transition">
+                        Create Post
+                    </a>
+                    <a href="{% url 'create_subreddit' %}" class="block w-full text-center border border-indigo-600 text-indigo-600 hover:bg-indigo-50 text-sm font-medium py-2 rounded-full transition">
+                        Create Community
+                    </a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 rounded-full transition">
+                        Join Discuss
+                    </a>
                 {% endif %}
             </div>
         </div>
-    {% empty %}
-        <p>No posts yet. Be the first to share something!</p>
-    {% endfor %}
+    </aside>
+
 </div>
-</div>
-</body>
-</html>
+{% endblock %}

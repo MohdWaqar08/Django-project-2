@@ -1,35 +1,64 @@
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-    <h2>Login to Your Account</h2>
+{% block title %}Log In | Discuss{% endblock %}
 
-    {% for message in messages %}
-        <p>{{ message }}</p>
-    {% endfor %}
+{% block content %}
+<div class="max-w-md mx-auto mt-6">
+    <div class="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-xs">
+        
+        <div class="text-center mb-6">
+            <h1 class="text-xl font-bold text-slate-900">Welcome Back</h1>
+            <p class="text-xs text-slate-500 mt-1">Log in to post, comment, and vote on discussions.</p>
+        </div>
 
-    <form method="POST">
-        {% csrf_token %}
+        {% if form.errors %}
+            <div class="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
+                Invalid username or password. Please try again.
+            </div>
+        {% endif %}
 
-        <label>Username:</label>
-        <input type="text" name="username" required>
-        <br><br>
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
 
-        <label>Password:</label>
-        <input type="password" name="password" required>
-        <br><br>
+            <div>
+                <label for="id_username" class="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Username
+                </label>
+                <input 
+                    type="text" 
+                    name="username" 
+                    id="id_username"
+                    required 
+                    autofocus
+                    class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                >
+            </div>
 
-        <button type="submit">Login</button>
-    </form>
+            <div>
+                <label for="id_password" class="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Password
+                </label>
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="id_password"
+                    required
+                    class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                >
+            </div>
 
-    <p>
-        Don't have an account?
-        <a href="{% url 'register' %}">Register here</a>
-    </p>
-</body>
-</html>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2.5 rounded-full transition cursor-pointer mt-2">
+                Log In
+            </button>
+        </form>
+
+        <p class="text-center text-xs text-slate-500 mt-6 pt-4 border-t border-slate-100">
+            Don't have an account? 
+            <a href="{% url 'register' %}" class="font-semibold text-indigo-600 hover:text-indigo-700 hover:underline">
+                Sign up here
+            </a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}

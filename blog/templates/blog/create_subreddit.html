@@ -1,11 +1,46 @@
-<h1>Create your own Subreddit</h1>
+{% extends 'base.html' %}
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
+{% block title %}Create Community | Discuss{% endblock %}
 
-    {{ form.as_p }}
+{% block content %}
+<div class="max-w-xl mx-auto">
+    <div class="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-xs">
+        
+        <div class="border-b border-slate-100 pb-4 mb-6">
+            <h1 class="text-xl font-bold text-slate-900">Create a Community</h1>
+            <p class="text-xs text-slate-500 mt-1">Build a dedicated space for a topic, interest, or group.</p>
+        </div>
 
-    <button type="submit">Create</button>
-</form>
+        <form method="POST" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
 
-<a href="{% url 'blog_home' %}">Cancel</a>
+            {% if form.non_field_errors %}
+                <div class="p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="space-y-4
+                [&_p]:space-y-1.5
+                [&_label]:block [&_label]:text-sm [&_label]:font-semibold [&_label]:text-slate-700
+                [&_input[type='text']]:w-full [&_input[type='text']]:rounded-lg [&_input[type='text']]:border [&_input[type='text']]:border-slate-300 [&_input[type='text']]:px-3.5 [&_input[type='text']]:py-2 [&_input[type='text']]:text-sm [&_input[type='text']]:text-slate-800 [&_input[type='text']:focus]:border-indigo-500 [&_input[type='text']:focus]:outline-none [&_input[type='text']:focus]:ring-2 [&_input[type='text']:focus]:ring-indigo-500/20
+                [&_textarea]:w-full [&_textarea]:rounded-lg [&_textarea]:border [&_textarea]:border-slate-300 [&_textarea]:p-3.5 [&_textarea]:text-sm [&_textarea]:text-slate-800 [&_textarea]:min-h-[110px] [&_textarea:focus]:border-indigo-500 [&_textarea:focus]:outline-none [&_textarea:focus]:ring-2 [&_textarea:focus]:ring-indigo-500/20
+                [&_input[type='file']]:block [&_input[type='file']]:w-full [&_input[type='file']]:text-sm [&_input[type='file']]:text-slate-500 [&_input[type='file']]:file:mr-4 [&_input[type='file']]:file:py-2 [&_input[type='file']]:file:px-4 [&_input[type='file']]:file:rounded-full [&_input[type='file']]:file:border-0 [&_input[type='file']]:file:text-xs [&_input[type='file']]:file:font-semibold [&_input[type='file']]:file:bg-indigo-50 [&_input[type='file']]:file:text-indigo-700 hover:[&_input[type='file']]:file:bg-indigo-100
+                [&_.helptext]:block [&_.helptext]:text-xs [&_.helptext]:text-slate-400
+                [&_.errorlist]:text-xs [&_.errorlist]:text-red-600 [&_.errorlist]:font-medium">
+                {{ form.as_p }}
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <a href="{% url 'blog_home' %}" class="px-4 py-2 rounded-full text-sm font-medium text-slate-600 hover:bg-slate-100 transition">
+                    Cancel
+                </a>
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-6 py-2 rounded-full transition cursor-pointer">
+                    Create Community
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

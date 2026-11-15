@@ -1,27 +1,113 @@
-<div class="feed-container">
-    {% for post in posts %}
-        <div class="post-card">
-            <!-- Subreddit and Author info line -->
-            <div class="post-meta">
-                <a href="{% url 'subreddit_feed' post.subreddits.slug %}">r/{{ post.subreddits.name }}</a> • 
-                Posted by u/{{ post.author.username }} 
-                <span class="timestamp">{{ post.created_on|timesince }} ago</span>
-            </div>
+{% extends 'base.html' %}
 
-            <!-- Post Title & Content -->
-            <h2><a href="{% url 'comment' post.id %}">{{ post.title }}</a></h2>
-            <p>{{ post.content|truncatewords:30 }}</p>
+{% block title %}Search{% if request.GET.q %}: {{ request.GET.q }}{% endif %} | Discuss{% endblock %}
 
-            {% if post.image %}
-                <img src="{{ post.image.url }}" alt="{{ post.title }}">
-            {% endif %}
-            <a href="{% url 'comment' post.id %}">💬 Comments</a>
-            <a href="{% url 'update_blog' post.id %}">Update</a>
-            <a href="{% url 'delete_blog' post.id %}">Delete</a>
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-5">
+
+    <!-- Search Header -->
+    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div>
+            <h1 class="text-lg font-bold text-slate-900">
+                {% if request.GET.q %}
+                    Search results for <span class="text-indigo-600">"{{ request.GET.q }}"</span>
+                {% else %}
+                    Search Results
+                {% endif %}
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">{{ posts|length }} result{{ posts|length|pluralize }} found</p>
         </div>
-    {% empty %}
-        <p>No posts yet. Be the first to share something!</p>
-    {% endfor %}
-</div>
 
-<a href="{% url 'blog_home' %}"> Go home</a>
+        <a href="{% url 'blog_home' %}" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition">
+            ← Back to Feed
+        </a>
+    </div>
+
+    <!-- Results Feed -->
+    <div class="space-y-4">
+        {% for post in posts %}
+            <article class="bg-white border border-slate-200 hover:border-slate-300 rounded-xl shadow-xs transition flex overflow-hidden">
+                
+                <!-- Left Vertical Vote Strip -->
+                <div class="bg-slate-50/80 px-3 py-4 flex flex-col items-center justify-start gap-1 border-r border-slate-100 select-none">
+                    <form action="{% url 'post-vote' post.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="value" value="1">
+                        <button type="submit" title="Upvote" class="p-1 rounded hover:bg-orange-100 text-slate-500 hover:text-orange-600 transition cursor-pointer">
+                            ▲
+                        </button>
+                    </form>
+
+                    <span class="text-xs font-bold text-slate-800">{{ post.total_score }}</span>
+
+                    <form action="{% url 'post-vote' post.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="value" value="-1">
+                        <button type="submit" title="Downvote" class="p-1 rounded hover:bg-indigo-100 text-slate-500 hover:text-indigo-600 transition cursor-pointer">
+                            ▼
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Post Content -->
+                <div class="p-4 flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 mb-1.5">
+                        <a href="{% url 'subreddit_feed' post.subreddits.slug %}" class="font-bold text-slate-800 hover:text-indigo-600 hover:underline">
+                            r/{{ post.subreddits.name }}
+                        </a>
+                        <span>•</span>
+                        <span>Posted by u/{{ post.author.username }}</span>
+                        <span>•</span>
+                        <span>{{ post.created_on|timesince }} ago</span>
+                    </div>
+
+                    <h2 class="text-lg font-semibold text-slate-900 leading-snug mb-2">
+                        <a href="{% url 'comment' post.id %}" class="hover:text-indigo-600 transition">
+                            {{ post.title }}
+                        </a>
+                    </h2>
+
+                    {% if post.content %}
+                        <p class="text-sm text-slate-600 leading-relaxed mb-3">
+                            {{ post.content|truncatewords:30 }}
+                        </p>
+                    {% endif %}
+
+                    {% if post.image %}
+                        <div class="mb-3 rounded-lg overflow-hidden border border-slate-100 bg-slate-50">
+                            <a href="{% url 'comment' post.id %}">
+                                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="max-h-80 w-full object-contain mx-auto">
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    <div class="flex items-center gap-4 pt-1 text-xs font-medium text-slate-500">
+                        <a href="{% url 'comment' post.id %}" class="flex items-center gap-1.5 px-2 py-1.5 rounded-md hover:bg-slate-100 hover:text-slate-800 transition">
+                            <span>💬</span>
+                            <span>Comments</span>
+                        </a>
+
+                        {% if request.user == post.author %}
+                            <a href="{% url 'update_blog' post.id %}" class="px-2 py-1.5 rounded-md hover:bg-slate-100 hover:text-indigo-600 transition">
+                                Edit
+                            </a>
+                            <a href="{% url 'delete_blog' post.id %}" class="px-2 py-1.5 rounded-md hover:bg-red-50 hover:text-red-600 transition">
+                                Delete
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+        {% empty %}
+            <div class="bg-white border border-slate-200 rounded-xl p-10 text-center">
+                <p class="text-slate-700 font-medium mb-1">No matching posts found.</p>
+                <p class="text-sm text-slate-400 mb-4">Try searching with different keywords or browse the home feed.</p>
+                <a href="{% url 'blog_home' %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-full transition">
+                    Return Home
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
