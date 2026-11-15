@@ -30,6 +30,9 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+    def total_score(self):
+        return self.votes.aggregate(models.Sum('vote'))['vote__sum'] or 0
+
 class Comments(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
@@ -39,3 +42,19 @@ class Comments(models.Model):
     
     def __str__(self):
         return f"Comment by {self.author} on {self.post}"
+
+class Vote(models.Model):
+    VOTE_CHOICE = (
+        (1, 'Upvote'),
+        (-1, 'Downvote')
+    )
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='votes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    vote = models.SmallIntegerField(choices=VOTE_CHOICE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=('user','post'), name='unique_user_post_vote')
+        ]
+

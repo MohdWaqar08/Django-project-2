@@ -1,11 +1,12 @@
 from django.shortcuts import get_object_or_404, redirect
-from .models import Post, Subreddits
-from django.views.generic import ListView, UpdateView, DeleteView, CreateView, DetailView
+from .models import Post, Subreddits, Vote
+from django.views.generic import ListView, UpdateView, DeleteView, CreateView, DetailView, View
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin , UserPassesTestMixin
 from . forms import PostForm, SubredditForm, CommentForm
 from django.db.models import Q
+from django.contrib import messages
 
 # View to create posts
 class AddPost(LoginRequiredMixin, CreateView):
@@ -70,7 +71,7 @@ class SearchFeed(ListView):
 
 
 # Handles comments
-class CommentView(FormMixin,DetailView):
+class CommentView(FormMixin, LoginRequiredMixin ,DetailView):
     model = Post
     form_class = CommentForm
     template_name = 'blog/post_detail.html'
@@ -105,7 +106,7 @@ class CommentView(FormMixin,DetailView):
 
 
 
-class UpdatePost(LoginRequiredMixin, UpdateView):
+class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/Update_post_page.html'
@@ -115,8 +116,54 @@ class UpdatePost(LoginRequiredMixin, UpdateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
 
-class DeletePost(LoginRequiredMixin, DeleteView):
+    def handle_no_permission(self):
+        if not self.request.user.is_authenticated:
+            return super().handle_no_permission()
+
+        messages.error(self.request, "You are not authorized to edit this page")
+        return redirect('blog_home')
+
+
+class DeletePost(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     template_name = 'blog/delete_blog.html'
     success_url = reverse_lazy('blog_home')
+
+    def test_func(self):
+            post = self.get_object()
+            return self.request.user == post.author
+    
+    def handle_no_permission(self):
+        if not self.request.user.is_authenticated:
+            return super().handle_no_permission()
+
+        messages.error(self.request, "You are not authorized to edit this page")
+        return redirect('blog_home')
+
+
+class VoteView(View, LoginRequiredMixin):
+    def post(self, request, pk):
+        if not self.request.user.is_authenticated:
+            return redirect('login')
+
+        post = get_object_or_404(Post, pk = pk)
+        vote_value = int(request.POST.get('value'))
+
+        vote_obj , created = Vote.objects.get_or_create(
+            user = request.user,
+            post = post,
+            defaults={'vote': vote_value}
+        )
+
+        if not created:
+            if vote_obj.vote == vote_value:
+                vote_obj.delete()
+            else:
+                vote_obj.vote = vote_value
+                vote_obj.save()
+
+        return redirect(request.META.get('HTTP_REFERER',reverse('comment', kwargs={'pk': post.pk})))

@@ -9,6 +9,7 @@
 <body>
     <h1>Welcome to My Website!</h1>
 
+
     {% if user.is_authenticated %}
         <h2>Hello, {{ user.username }}!</h2>
         <p>You are logged in successfully.</p>
@@ -35,13 +36,22 @@
         <a href="{% url 'register' %}">Register</a>
     {% endif %}
 
+    {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% block content %}{% endblock %}
 
     <div class="feed-container">
     {% for post in posts %}
         <div class="post-card">
             <!-- Subreddit and Author info line -->
             <div class="post-meta">
-                <a href="{% url 'subreddit_feed' post.subreddits.slug %}">r/{{ post.subreddits.name }}</a> • 
+                <a href="{% url 'subreddit_feed' post.subreddits.slug %}">r/{{ post.subreddits.name }}</a>
                 Posted by u/{{ post.author.username }} 
                 <span class="timestamp">{{ post.created_on|timesince }} ago</span>
             </div>
@@ -53,13 +63,39 @@
             {% if post.image %}
                 <img src="{{ post.image.url }}" alt="{{ post.title }}">
             {% endif %}
-            <a href="{% url 'comment' post.id %}">💬 Comments</a>
-            <a href="{% url 'update_blog' post.id %}">Update</a>
-            <a href="{% url 'delete_blog' post.id %}">Delete</a>
+
+            <!-- Action Bar (Voting + Links) -->
+            <div class="post-actions" style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                
+                <!-- Voting Widget -->
+                <div class="voting-widget" style="display: flex; align-items: center; gap: 6px;">
+                    <form action="{% url 'post-vote' post.id %}" method="post" style="margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="value" value="1">
+                        <button type="submit" style="cursor: pointer;">⬆</button>
+                    </form>
+
+                    <span style="font-weight: bold;">{{ post.total_score }}</span>
+
+                    <form action="{% url 'post-vote' post.id %}" method="post" style="margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="value" value="-1">
+                        <button type="submit" style="cursor: pointer;">⬇</button>
+                    </form>
+                </div>
+
+                <!-- Existing Links -->
+                <a href="{% url 'comment' post.id %}">💬 Comments</a>
+                {% if request.user == post.author %}
+                <a href="{% url 'update_blog' post.id %}">Update</a>
+                <a href="{% url 'delete_blog' post.id %}">Delete</a>
+                {% endif %}
+            </div>
         </div>
     {% empty %}
         <p>No posts yet. Be the first to share something!</p>
     {% endfor %}
+</div>
 </div>
 </body>
 </html>
