@@ -7,6 +7,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin , UserPassesTestMixin
 from . forms import PostForm, SubredditForm, CommentForm
 from django.db.models import Q
 from django.contrib import messages
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 
 # View to create posts
 class AddPost(LoginRequiredMixin, CreateView):
@@ -53,8 +55,8 @@ class HomePageFeed(ListView):
     paginate_by = 25
 
     def get_queryset(self):
-        return Post.objects.select_related('subreddits', 'author').order_by('-created_on')
-
+        return (Post.objects.select_related('subreddits', 'author')
+                .annotate(score = Coalesce(Sum('votes__vote'), 0)).order_by('-score','-created_on'))
 
 # Search Functionality
 class SearchFeed(ListView):
