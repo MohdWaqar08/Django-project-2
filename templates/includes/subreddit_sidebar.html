@@ -1,0 +1,24 @@
+<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex-1 min-h-0 flex flex-col">
+    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 shrink-0">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Communities</span>
+        {% if user.is_authenticated %}
+            <a href="{% url 'create_subreddit' %}" class="text-xs font-semibold text-indigo-600 hover:underline">
+                + New
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Scrollable inner list that automatically fits remaining viewport height on desktop -->
+    <ul class="space-y-1 max-h-56 lg:max-h-none flex-1 overflow-y-auto pr-1">
+        {% for sub in sidebar_subreddits %}
+            <li>
+                <a href="{% url 'subreddit_feed' sub.slug %}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-indigo-600 transition">
+                    <span class="truncate">r/{{ sub.name }}</span>
+                    <span class="text-xs text-slate-400 shrink-0 ml-2">→</span>
+                </a>
+            </li>
+        {% empty %}
+            <li class="text-xs text-slate-400 py-2">No communities created yet.</li>
+        {% endfor %}
+    </ul>
+</div>
