@@ -27,4 +27,4 @@ python manage.py runserver
 ```
 
 ## Live Demo
-Coming soon — deployment in progress.
+[Live Demo](https://MohdWaqar08.pythonanywhere.com/blog/)
