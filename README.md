@@ -1,13 +1,30 @@
-This is being changed to a reddit clone.
+# Reddit-Inspired Discussion Platform (Traditional Django MVT)
 
-In reddit, the posts on the home page will be diplayed with the name of author and subreddit.
+A Reddit-inspired full-stack web application built using **traditional Django (MVT architecture & Class-Based Views)** and **Tailwind CSS**, created to showcase core Django backend development, relational database modeling, authentication, and authorization.
 
-We now can add posts and link them to subreddits. We can update posts. Have a feed of posts. Can delte posts. 
+## Key Features
+- **Authentication & Account Management:** User registration, login/logout, and password change flows.
+- **Communities & Content:** Create and browse subreddits, publish posts with image upload support, and participate in nested comments.
+- **Engagement & Discovery:** Upvote/downvote score sorting, search, pagination, and author-only edit/delete authorization.
+- **Responsive UI:** Styled with Tailwind CSS using a shared base template architecture and dark mode support.
 
-My home page needs a few more things. 
-1) A button to add Subreddits 
-2) posts having a a button to see comments
+## Tech Stack
+- **Backend:** Python, Django (MVT, Class-Based Views, ORM)
+- **Frontend:** Django Templates, Tailwind CSS
+- **Database:** SQLite
+- **Deployment:** WhiteNoise, Gunicorn
 
+## Running Locally
 
-We need a view that handles Add a subreddit.
-And we need a view that handles comments
+```bash
+git clone [https://github.com/](https://github.com/)MohdWaqar08/Django-project-2.git
+cd Django-project-2
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+## Live Demo
+Coming soon — deployment in progress.
