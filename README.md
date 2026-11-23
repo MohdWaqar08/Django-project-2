@@ -28,3 +28,4 @@ python manage.py runserver
 
 ## Live Demo
 [Live Demo](https://MohdWaqar08.pythonanywhere.com/blog/)
+> **Viewing Note:** Best experienced on desktop or laptop screens. Mobile view is functional, though a few minor layout/UI rough edges remain.
